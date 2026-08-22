@@ -19,9 +19,30 @@ const ibmPlexArabic = IBM_Plex_Sans_Arabic({
   weight: ["300", "400", "500", "600", "700"],
 });
 export const metadata: Metadata = {
-  title: "SAACO-SA | Contracting & Construction",
+  metadataBase: new URL("https://www.saaco-sa.com"),
+
+  title: "SARAYA Advanced Arab Co | Contracting & Construction",
+
   description:
-    "SAACO-SA provides professional contracting, construction, infrastructure, MEP, maintenance, renovation, and turnkey project services.",
+    "SARAYA Advanced Arab Co provides professional contracting, construction, infrastructure, MEP, maintenance, renovation, and turnkey solutions.",
+
+  openGraph: {
+    title: "SARAYA Advanced Arab Co | Contracting & Construction",
+    description:
+      "Professional contracting, construction, infrastructure, MEP, maintenance, renovation, and turnkey solutions.",
+    url: "https://www.saaco-sa.com",
+    siteName: "SARAYA Advanced Arab Co",
+    locale: "en_US",
+    type: "website",
+    images: [
+  {
+    url: "/og-saraya.png",
+    width: 1200,
+    height: 630,
+    alt: "SARAYA Advanced Arab Co",
+  },
+],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
