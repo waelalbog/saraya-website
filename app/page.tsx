@@ -7,6 +7,9 @@ export default function Home() {
   const [language, setLanguage] = useState<"en" | "ar">("en");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 const [languageReady, setLanguageReady] = useState(false);
+const [selectedHomeProject, setSelectedHomeProject] = useState<
+    "sama" | "sekak" | "rawa" | null
+  >(null);
   const isArabic = language === "ar";
 useEffect(() => {
   const savedLanguage = localStorage.getItem("saaco-language") as "en" | "ar" | null;
@@ -20,6 +23,23 @@ useEffect(() => {
 
   setLanguageReady(true);
 }, [language]);
+useEffect(() => {
+  if (!selectedHomeProject) return;
+
+  const handleEscape = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setSelectedHomeProject(null);
+    }
+  };
+
+  document.addEventListener("keydown", handleEscape);
+  document.body.style.overflow = "hidden";
+
+  return () => {
+    document.removeEventListener("keydown", handleEscape);
+    document.body.style.overflow = "";
+  };
+}, [selectedHomeProject]);
   const services = [
   {
     number: "01",
@@ -819,53 +839,52 @@ return (
 
     {/* Header */}
     <div
-  className={`max-w-3xl ${
-     isArabic
-      ? "ml-auto mr-0 pt-4 text-right lg:pt-6"
-      : "ml-0 mr-auto pt-4 text-left lg:pt-6"
-  }`}
->
-  <h2 className="mt-0 text-4xl font-black leading-[1.15] tracking-tight text-zinc-950 sm:text-5xl lg:text-6xl">
-    {language === "en" ? (
-      <>
-        Projects built
-        <br />
-        <span className="text-[#2B347A]">to make an impact.</span>
-      </>
-    ) : (
-      <>
-        مشاريع نبنيها
-        <br />
-        <span className="text-[#2B347A]">لتصنع أثراً.</span>
-      </>
-    )}
-  </h2>
+      className={`max-w-3xl ${
+        isArabic
+          ? "ml-auto mr-0 pt-4 text-right lg:pt-6"
+          : "ml-0 mr-auto pt-4 text-left lg:pt-6"
+      }`}
+    >
+      <h2 className="mt-0 text-4xl font-black leading-[1.15] tracking-tight text-zinc-950 sm:text-5xl lg:text-6xl">
+        {language === "en" ? (
+          <>
+            Projects built
+            <br />
+            <span className="text-[#2B347A]">to make an impact.</span>
+          </>
+        ) : (
+          <>
+            مشاريع نبنيها
+            <br />
+            <span className="text-[#2B347A]">لتصنع أثراً.</span>
+          </>
+        )}
+      </h2>
 
-  <p className="mt-6 max-w-2xl text-[17px] leading-8 text-zinc-800 sm:text-lg">
-    {language === "en"
-      ? "A selection of residential, commercial, and community projects delivered with a focus on quality, precision, and professional execution."
-      : "مجموعة مختارة من مشاريعنا السكنية والتجارية والمجتمعية، نعمل على تنفيذها بجودة عالية ودقة واحترافية في جميع مراحل المشروع."}
-  </p>
-</div>
+      <p className="mt-6 max-w-2xl text-[17px] leading-8 text-zinc-800 sm:text-lg">
+        {language === "en"
+          ? "A selection of residential, commercial, and community projects delivered with a focus on quality, precision, and professional execution."
+          : "مجموعة مختارة من مشاريعنا السكنية والتجارية والمجتمعية، نعمل على تنفيذها بجودة عالية ودقة واحترافية في جميع مراحل المشروع."}
+      </p>
+    </div>
+
     {/* Projects */}
     <div className="mt-10 grid gap-6 lg:grid-cols-12">
 
       {/* Project 01 */}
-<article className="group relative min-h-[520px] overflow-hidden rounded-2xl bg-zinc-900 lg:col-span-7">
+      <article className="group relative min-h-[520px] overflow-hidden rounded-2xl bg-zinc-900 lg:col-span-7">
 
-  <Image
-    src="/image/مشروع سما الفرسان.jpg"
-    alt={
-      language === "en"
-        ? "Sama Al Fursan residential project in Riyadh"
-        : "مشروع سما الفرسان السكني في الرياض"
-    }
-    fill
-    className="object-cover transition-transform duration-700 group-hover:scale-105"
-    sizes="(min-width: 1024px) 58vw, 100vw"
-  />
-
-  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+        <Image
+          src="/image/مشروع سما الفرسان.jpg"
+          alt={
+            language === "en"
+              ? "Sama Al Fursan residential project in Riyadh"
+              : "مشروع سما الفرسان السكني في الرياض"
+          }
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          sizes="(min-width: 1024px) 58vw, 100vw"
+        />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
@@ -876,44 +895,35 @@ return (
         </div>
 
         <div
-  className={`absolute bottom-0 left-0 right-0 p-8 lg:p-10 ${
-    isArabic ? "text-right" : "text-left"
-  }`}
->
-
+          className={`absolute bottom-0 left-0 right-0 p-8 lg:p-10 ${
+            isArabic ? "text-right" : "text-left"
+          }`}
+        >
           <div className="text-xs font-bold uppercase tracking-[0.25em] text-white/70">
             {language === "en" ? "Residential" : "سكني"}
           </div>
 
           <h3 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
-  {language === "en"
-    ? "Sama Al Fursan"
-    : "سما الفرسان"}
-</h3>
-
-          <p className="mt-4 max-w-lg text-sm leading-7 text-white/75">
-  {language === "en"
-    ? "A major residential development in Riyadh comprising 833 villas, delivered for Al Tahaluf Real Estate Company with a total project value of SAR 220 million."
-    : "أحد المشاريع السكنية الكبرى في مدينة الرياض، ويضم 833 فيلا سكنية، نُفذ لصالح شركة التحالف العقارية بقيمة إجمالية بلغت 220 مليون ريال سعودي."
-    }
-</p>
+            {language === "en" ? "Sama Al Fursan" : "سما الفرسان"}
+          </h3>
 
           <button
             type="button"
+            onClick={() => setSelectedHomeProject("sama")}
             className="mt-7 inline-flex items-center gap-3 text-sm font-bold text-white transition hover:text-[#2B347A]"
           >
             {language === "en" ? "View Project" : "عرض المشروع"}
-            <span
-  className={`text-lg transition-transform duration-300 ${
-    isArabic
-      ? "rotate-180 group-hover:-translate-x-1"
-      : "group-hover:translate-x-1"
-  }`}
->
-  →
-</span>
-          </button>
 
+            <span
+              className={`text-lg transition-transform duration-300 ${
+                isArabic
+                  ? "rotate-180 group-hover:-translate-x-1"
+                  : "group-hover:translate-x-1"
+              }`}
+            >
+              →
+            </span>
+          </button>
         </div>
       </article>
 
@@ -921,16 +931,17 @@ return (
       <article className="group relative min-h-[520px] overflow-hidden rounded-2xl bg-zinc-800 lg:col-span-5">
 
         <Image
-  src="/image/مشروع سكك تلاله.jpg"
-  alt={
-    language === "en"
-      ? "Sekak Talalah residential project in Al Narjis, Riyadh"
-      : "مشروع سكك تلاله السكني في حي النرجس بالرياض"
-  }
-  fill
-  className="object-cover transition-transform duration-700 group-hover:scale-105"
-  sizes="(min-width: 1024px) 42vw, 100vw"
-/>
+          src="/image/مشروع سكك تلاله.jpg"
+          alt={
+            language === "en"
+              ? "Sekak Talalah residential project in Al Narjis, Riyadh"
+              : "مشروع سكك تلاله السكني في حي النرجس بالرياض"
+          }
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          sizes="(min-width: 1024px) 42vw, 100vw"
+        />
+
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
 
         <div className="absolute left-8 top-8">
@@ -939,34 +950,36 @@ return (
           </span>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-8">
-
-          <div className="text-xs font-bold uppercase tracking-[0.25em] text-[#2B347A]">
+        <div
+          className={`absolute bottom-0 left-0 right-0 p-8 ${
+            isArabic ? "text-right" : "text-left"
+          }`}
+        >
+          <div className="text-xs font-bold uppercase tracking-[0.25em] text-white/70">
             {language === "en" ? "Residential" : "سكني"}
           </div>
 
           <h3 className="mt-3 text-2xl font-bold text-white sm:text-3xl">
-            {language === "en"
-  ? "Sekak Talalah"
-  : "سكك تلاله"}
+            {language === "en" ? "Sekak Talalah" : "سكك تلاله"}
           </h3>
-
-          <p className="mt-4 text-sm leading-7 text-white/80">
-            {language === "en"
-  ? "A residential compound in Al Narjis, north Riyadh, comprising 104 units and constructed using advanced aluminum formwork technology for faster, precise, and durable execution."
-  : "مجمع سكني في حي النرجس شمال الرياض يضم 104 وحدات سكنية، ويعتمد في تنفيذه على تقنية قوالب الألمنيوم الحديثة لتحقيق سرعة ودقة التنفيذ مع الحفاظ على أعلى معايير المتانة."}
-          </p>
 
           <button
             type="button"
+            onClick={() => setSelectedHomeProject("sekak")}
             className="mt-7 inline-flex items-center gap-3 text-sm font-bold text-white transition hover:text-[#2B347A]"
           >
             {language === "en" ? "View Project" : "عرض المشروع"}
-            <span className="text-lg transition-transform duration-300 group-hover:translate-x-1">
+
+            <span
+              className={`text-lg transition-transform duration-300 ${
+                isArabic
+                  ? "rotate-180 group-hover:-translate-x-1"
+                  : "group-hover:translate-x-1"
+              }`}
+            >
               →
             </span>
           </button>
-
         </div>
       </article>
 
@@ -974,59 +987,72 @@ return (
       <article className="group relative min-h-[420px] overflow-hidden rounded-2xl bg-zinc-100 lg:col-span-5">
 
         <Image
-  src="/image/مسجد رواء.jpg"
-  alt={
-    language === "en"
-      ? "Rawa Mosque project in Riyadh"
-      : "مشروع مسجد رواء في الرياض"
-  }
-  fill
-  className="object-cover transition-transform duration-700 group-hover:scale-105"
-  sizes="(min-width: 1024px) 42vw, 100vw"
-/>
+          src="/image/مسجد رواء.jpg"
+          alt={
+            language === "en"
+              ? "Rawa Mosque project in Riyadh"
+              : "مشروع مسجد رواء في الرياض"
+          }
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          sizes="(min-width: 1024px) 42vw, 100vw"
+        />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
 
         <div className="absolute left-8 top-8">
-          <span className="rounded-full border border-zinc-950/20 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-zinc-800">
+          <span className="rounded-full border border-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white/70">
             {language === "en" ? "Religious" : "ديني"}
           </span>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-8 pb-10">
-
-          <div className="text-xs font-bold uppercase tracking-[0.25em] text-[#2B347A]">
+        <div
+          className={`absolute bottom-0 left-0 right-0 p-8 pb-10 ${
+            isArabic ? "text-right" : "text-left"
+          }`}
+        >
+          <div className="text-xs font-bold uppercase tracking-[0.25em] text-white/70">
             {language === "en" ? "Religious" : "ديني"}
           </div>
 
           <h3 className="mt-3 text-2xl font-bold text-white sm:text-3xl">
-            {language === "en"
-  ? "Rawa Mosque"
-  : "مسجد رواء"}
+            {language === "en" ? "Rawa Mosque" : "مسجد رواء"}
           </h3>
 
-          <p className="mt-4 text-sm leading-7 text-zinc-300">
-            {language === "en"
-  ? "A contemporary mosque project in Riyadh that reflects the spirit of Islamic architecture through a modern vision, designed to provide a comfortable and inspiring worship environment. The project spans 2,865.47 m² and was delivered for the National Housing Company."
-  : "مشروع مسجد معاصر في مدينة الرياض يجسد روح العمارة الإسلامية برؤية حديثة، وصُمم لتوفير بيئة مريحة وملهمة للمصلين. يمتد المشروع على مساحة إجمالية تبلغ 2,865.47 م²، ونُفذ لصالح الشركة الوطنية للإسكان."}
-          </p>
+          <button
+            type="button"
+            onClick={() => setSelectedHomeProject("rawa")}
+            className="mt-7 inline-flex items-center gap-3 text-sm font-bold text-white transition hover:text-[#2B347A]"
+          >
+            {language === "en" ? "View Project" : "عرض المشروع"}
 
+            <span
+              className={`text-lg transition-transform duration-300 ${
+                isArabic
+                  ? "rotate-180 group-hover:-translate-x-1"
+                  : "group-hover:translate-x-1"
+              }`}
+            >
+              →
+            </span>
+          </button>
         </div>
       </article>
 
       {/* CTA */}
       <div className="flex min-h-[380px] flex-col justify-between rounded-2xl bg-[#2B347A]/95 p-8 shadow-xl shadow-black/10 backdrop-blur-sm lg:col-span-7 lg:p-10">
+
         <div>
           <div className="text-xs font-black uppercase tracking-[0.3em] text-white/60">
             {language === "en"
-  ? "Have a project in mind?"
-  : "لديك مشروع في ذهنك؟"}
+              ? "Have a project in mind?"
+              : "لديك مشروع في ذهنك؟"}
           </div>
 
           <h3 className="mt-6 max-w-xl text-4xl font-black leading-tight text-white sm:text-5xl">
             {language === "en"
-  ? "Let's turn your vision into reality."
-  : "لنحوّل رؤيتك إلى واقع."}
+              ? "Let's turn your vision into reality."
+              : "لنحوّل رؤيتك إلى واقع."}
           </h3>
         </div>
 
@@ -1035,13 +1061,12 @@ return (
           className="inline-flex w-fit items-center gap-3 rounded-full bg-zinc-950 px-7 py-4 text-sm font-bold text-white transition hover:bg-zinc-800"
         >
           {language === "en"
-  ? "Start a Conversation"
-  : "ابدأ محادثة معنا"}
+            ? "Start a Conversation"
+            : "ابدأ محادثة معنا"}
+
           <span className="text-lg">→</span>
         </a>
-
       </div>
-
     </div>
 
     {/* Bottom link */}
@@ -1051,23 +1076,297 @@ return (
         className="group inline-flex items-center gap-3 rounded-full border border-zinc-950/15 bg-white/70 px-6 py-3 text-sm font-bold text-zinc-950 backdrop-blur-sm transition hover:border-[#2B347A]/30 hover:bg-white"
       >
         {language === "en"
-  ? "View all projects"
-  : "عرض جميع المشاريع"}
+          ? "View all projects"
+          : "عرض جميع المشاريع"}
+
         <span
-  className={`transition-transform duration-300 ${
-    isArabic
-      ? "rotate-180 group-hover:-translate-x-2"
-      : "group-hover:translate-x-2"
-  }`}
->
-  →
-</span>
+          className={`transition-transform duration-300 ${
+            isArabic
+              ? "rotate-180 group-hover:-translate-x-2"
+              : "group-hover:translate-x-2"
+          }`}
+        >
+          →
+        </span>
       </a>
     </div>
-
   </div>
 </section>
 
+{/* ================= HOME PROJECT MODAL ================= */}
+{selectedHomeProject && (
+  <div
+    dir={isArabic ? "rtl" : "ltr"}
+    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+    onClick={() => setSelectedHomeProject(null)}
+  >
+    <div
+      className="relative max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8 lg:p-10"
+      onClick={(event) => event.stopPropagation()}
+    >
+      {/* Close */}
+      <button
+        type="button"
+        onClick={() => setSelectedHomeProject(null)}
+        aria-label={isArabic ? "إغلاق" : "Close"}
+        className={`absolute top-5 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 bg-white text-xl font-bold text-zinc-700 shadow-sm transition hover:border-[#2B347A] hover:bg-[#2B347A] hover:text-white ${
+          isArabic ? "left-5" : "right-5"
+        }`}
+      >
+        ×
+      </button>
+
+      {/* ================= SAMA AL FURSAN ================= */}
+      {selectedHomeProject === "sama" && (
+        <>
+          {/* Modal Header */}
+          <div className="border-b border-zinc-200 pb-6">
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#2B347A]">
+              {isArabic ? "تفاصيل المشروع" : "Project Details"}
+            </p>
+
+            <h2 className="mt-3 pe-12 text-3xl font-black text-zinc-950 sm:text-4xl">
+              {isArabic ? "سما الفرسان" : "Sama Al Fursan"}
+            </h2>
+
+            <div className="mt-5 h-1 w-16 bg-[#2B347A]" />
+          </div>
+
+          {/* Description */}
+          <p className="mx-auto mt-7 max-w-4xl text-base leading-8 text-zinc-600 sm:text-lg sm:leading-9">
+            {isArabic
+              ? "يعد مشروع ضاحية سما الفرسان أحد المشاريع السكنية الكبرى التي نفذتها سرايا العربية المتطورة في مدينة الرياض لصالح شركة التحالف العقارية، بقيمة إجمالية بلغت 220 مليون ريال سعودي. شمل المشروع تنفيذ 833 فيلا سكنية، وتم إنجازه بالكامل بنسبة 100% وفق أعلى المعايير الهندسية والتنفيذية."
+              : "Sama Al Fursan District is one of the major residential projects delivered by SARAYA Advanced Arab Co in Riyadh for Al Tahaluf Real Estate Company, with a total project value of SAR 220 million. The project included the construction of 833 residential villas and was completed 100% in accordance with high engineering and execution standards."}
+          </p>
+
+          {/* Info Grid */}
+          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <InfoBox
+              icon="location"
+              label={isArabic ? "الموقع" : "Location"}
+              value={isArabic ? "الرياض" : "Riyadh"}
+            />
+
+            <InfoBox
+              icon="units"
+              label={isArabic ? "عدد الوحدات" : "Units"}
+              value="833"
+            />
+
+            <InfoBox
+              icon="area"
+              label={isArabic ? "المساحة" : "Area"}
+              value="160,000 SM"
+            />
+
+            <InfoBox
+              icon="owner"
+              label={isArabic ? "اسم المالك" : "Owner"}
+              value={
+                isArabic
+                  ? "شركة التحالف العقارية"
+                  : "Al Tahaluf Real Estate Company"
+              }
+            />
+
+            <InfoBox
+              icon="role"
+              label={isArabic ? "نطاق العمل" : "Scope of Work"}
+              value={isArabic ? "مقاول" : "Contractor"}
+            />
+
+            <InfoBox
+              icon="status"
+              label={isArabic ? "نسبة الإنجاز" : "Completion"}
+              value={isArabic ? "مكتمل" : "Completed"}
+            />
+          </div>
+        </>
+      )}
+
+      {/* ================= SEKAK TALALAH ================= */}
+      {selectedHomeProject === "sekak" && (
+        <>
+          {/* Modal Header */}
+          <div className="border-b border-zinc-200 pb-6">
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#2B347A]">
+              {isArabic ? "تفاصيل المشروع" : "Project Details"}
+            </p>
+
+            <h2 className="mt-3 pe-12 text-3xl font-black text-zinc-950 sm:text-4xl">
+              {isArabic ? "سكك تلاله" : "Sekak Talalah"}
+            </h2>
+
+            <div className="mt-5 h-1 w-16 bg-[#2B347A]" />
+          </div>
+
+          {/* Description */}
+          <p className="mx-auto mt-7 max-w-4xl text-base leading-8 text-zinc-600 sm:text-lg sm:leading-9">
+            {isArabic
+              ? "مجمع سكني في حي النرجس شمال الرياض يضم 104 وحدات سكنية، ويعتمد في تنفيذه على تقنية قوالب الألمنيوم الحديثة لتحقيق سرعة ودقة التنفيذ مع الحفاظ على أعلى معايير المتانة."
+              : "A residential compound in Al Narjis district, north Riyadh, comprising 104 residential units. The project utilizes modern aluminum formwork technology to achieve speed and precision in execution while maintaining high standards of durability."}
+          </p>
+
+          {/* Info Grid */}
+          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <InfoBox
+              icon="location"
+              label={isArabic ? "الموقع" : "Location"}
+              value={isArabic ? "الرياض" : "Riyadh"}
+            />
+
+            <InfoBox
+              icon="units"
+              label={isArabic ? "عدد الوحدات" : "Units"}
+              value="104"
+            />
+
+            <InfoBox
+              icon="area"
+              label={isArabic ? "المساحة" : "Area"}
+              value="6,000 SM"
+            />
+
+            <InfoBox
+              icon="owner"
+              label={isArabic ? "اسم المالك" : "Owner"}
+              value={
+                isArabic
+                  ? "شركة وثبه للاستثمار"
+                  : "Wathbah Investment Company"
+              }
+            />
+
+            <InfoBox
+              icon="role"
+              label={isArabic ? "نطاق العمل" : "Scope of Work"}
+              value={isArabic ? "مقاول" : "Contractor"}
+            />
+
+            <InfoBox
+              icon="status"
+              label={isArabic ? "نسبة الإنجاز" : "Completion"}
+              value={isArabic ? "تحت التنفيذ" : "Under Construction"}
+            />
+          </div>
+          {/* Project Gallery */}
+<div className="mt-12 border-t border-zinc-200 pt-8">
+  <div className="mb-6">
+    <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#2B347A]">
+      {isArabic ? "صور المشروع" : "Project Gallery"}
+    </p>
+
+    <h3 className="mt-2 text-2xl font-black text-zinc-950">
+      {isArabic
+        ? "لقطات من مشروع سكك تلاله"
+        : "Inside Sekak Talalah"}
+    </h3>
+  </div>
+
+  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {[
+      "/image/sekak-01.jpg",
+      "/image/sekak-02.jpg",
+      "/image/sekak-03.jpg",
+      "/image/sekak-04.jpg",
+      "/image/sekak-05.jpg",
+      "/image/sekak-06.jpg",
+      "/image/sekak-07.jpg",
+      "/image/sekak-08.jpg",
+      "/image/sekak-09.jpg",
+    ].map((image, index) => (
+      <div
+        key={image}
+        className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-zinc-100"
+      >
+        <Image
+          src={image}
+          alt={
+            isArabic
+              ? `صورة ${index + 1} من مشروع سكك تلاله`
+              : `Sekak Talalah project image ${index + 1}`
+          }
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+      </div>
+    ))}
+  </div>
+</div>
+        </>
+      )}
+
+      {/* ================= RAWA MOSQUE ================= */}
+      {selectedHomeProject === "rawa" && (
+        <>
+          {/* Modal Header */}
+          <div className="border-b border-zinc-200 pb-6">
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#2B347A]">
+              {isArabic ? "تفاصيل المشروع" : "Project Details"}
+            </p>
+
+            <h2 className="mt-3 pe-12 text-3xl font-black text-zinc-950 sm:text-4xl">
+              {isArabic ? "مسجد رواء" : "Rawa Mosque"}
+            </h2>
+
+            <div className="mt-5 h-1 w-16 bg-[#2B347A]" />
+          </div>
+
+          {/* Description */}
+          <p className="mx-auto mt-7 max-w-4xl text-base leading-8 text-zinc-600 sm:text-lg sm:leading-9">
+            {isArabic
+              ? "مشروع مسجد معاصر في مدينة الرياض يجسد روح العمارة الإسلامية برؤية حديثة، وصُمم لتوفير بيئة مريحة وملهمة للمصلين. يمتد المشروع على مساحة إجمالية تبلغ 2,865.47 م²، ونُفذ لصالح الشركة الوطنية للإسكان."
+              : "A contemporary mosque project in Riyadh that reflects the spirit of Islamic architecture through a modern vision and was designed to provide a comfortable and inspiring environment for worshippers. The project spans a total area of 2,865.47 m² and was executed for the National Housing Company."}
+          </p>
+
+          {/* Info Grid */}
+          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <InfoBox
+              icon="location"
+              label={isArabic ? "الموقع" : "Location"}
+              value={isArabic ? "الرياض" : "Riyadh"}
+            />
+
+            <InfoBox
+              icon="units"
+              label={isArabic ? "عدد الوحدات" : "Units"}
+              value={isArabic ? "مبنى واحد" : "1 Building"}
+            />
+
+            <InfoBox
+              icon="area"
+              label={isArabic ? "المساحة" : "Area"}
+              value="2,865.47 SM"
+            />
+
+            <InfoBox
+              icon="owner"
+              label={isArabic ? "اسم المالك" : "Owner"}
+              value={
+                isArabic
+                  ? "الوطنية للإسكان"
+                  : "National Housing Company"
+              }
+            />
+
+            <InfoBox
+              icon="role"
+              label={isArabic ? "نطاق العمل" : "Scope of Work"}
+              value={isArabic ? "مقاول" : "Contractor"}
+            />
+
+            <InfoBox
+              icon="status"
+              label={isArabic ? "نسبة الإنجاز" : "Completion"}
+              value={isArabic ? "مكتمل" : "Completed"}
+            />
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+)}
       {/* ================= WHY SARAYA Advanced Arab Co ================= */}
 <section
   id="why-us"
@@ -1565,4 +1864,133 @@ rel="noopener noreferrer"
       </footer>
     </main>
   );
+  function InfoBox({
+  icon,
+  label,
+  value,
+}: {
+  icon: "location" | "units" | "area" | "owner" | "role" | "status";
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="relative flex min-h-[150px] flex-col items-center justify-center rounded-2xl border border-[#2B347A]/70 bg-white px-4 py-5 text-center transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+
+      {/* Decorative diamonds */}
+      <div className="absolute -top-2 left-5 flex gap-1">
+        <span className="h-3 w-3 rotate-45 bg-[#2B347A]" />
+        <span className="h-3 w-3 rotate-45 bg-[#2B347A]" />
+      </div>
+
+      {/* Icon */}
+      <div className="mb-3 flex h-10 w-10 items-center justify-center text-[#2B347A]">
+        <InfoIcon type={icon} />
+      </div>
+
+      <p className="text-sm font-medium text-zinc-500">
+        {label}
+      </p>
+
+      <p className="mt-1 text-base font-black text-[#2B347A] sm:text-lg">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function InfoIcon({
+  type,
+}: {
+  type: "location" | "units" | "area" | "owner" | "role" | "status";
+}) {
+  if (type === "location") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-9 w-9"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      >
+        <path d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11Z" />
+        <circle cx="12" cy="10" r="2.2" />
+      </svg>
+    );
+  }
+
+  if (type === "units") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-9 w-9"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      >
+        <path d="M4 21V8h6v13M10 21V3h7v18M17 21v-9h3v9" />
+        <path d="M2 21h20" />
+      </svg>
+    );
+  }
+
+  if (type === "area") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-9 w-9"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      >
+        <path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4" />
+        <path d="M8 8h8v8H8z" />
+      </svg>
+    );
+  }
+
+  if (type === "owner") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-9 w-9"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      >
+        <circle cx="9" cy="8" r="3" />
+        <path d="M3.5 20c.5-4 2.5-6 5.5-6s5 2 5.5 6" />
+        <path d="M16 7h5v13h-5M18 10h1M18 13h1M18 16h1" />
+      </svg>
+    );
+  }
+
+  if (type === "role") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        className="h-9 w-9"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      >
+        <path d="M5 12a7 7 0 0 1 14 0" />
+        <path d="M4 12h16M7 12v3M17 12v3M5 15h14" />
+        <path d="M9 5V3h6v2" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-9 w-9"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <circle cx="12" cy="12" r="8" />
+      <path d="m8.5 12 2.2 2.2 4.8-5" />
+    </svg>
+  );
+}
 }

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 type Language = "en" | "ar";
 
@@ -43,12 +44,23 @@ type Project = {
     ar: string;
   } | null;
 };
-
+const fallbackProjectImages: Record<number, string> = {
+  4: "/image/al-wajha-project.jpg",
+  5: "/image/lavera-project.jpg",
+  6: "/image/al-wurud-sales-center.jpg",
+  7: "/image/mursia-mosque.jpg",
+  8: "/image/al-drees-mosque.jpg",
+  9: "/image/al-majhad-mosque.jpg",
+  10: "/image/jira-makkah-project.jpg",
+  11: "/image/living-project.jpg",
+  12: "/image/misk-schools.jpg",
+};
 export default function ProjectsPage() {
   const [language, setLanguage] = useState<Language>("en");
   const [languageReady, setLanguageReady] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-
+const [projects, setProjects] = useState<Project[]>([]);
+const [projectsLoading, setProjectsLoading] = useState(true);
   const isArabic = language === "ar";
 
   useEffect(() => {
@@ -60,7 +72,100 @@ export default function ProjectsPage() {
 
     setLanguageReady(true);
   }, []);
+useEffect(() => {
+  const loadProjects = async () => {
+    setProjectsLoading(true);
 
+    const { data, error } = await supabase
+      .from("projects")
+      .select(`
+        id,
+        name_en,
+        name_ar,
+        cover_image_url,
+        location_en,
+        location_ar,
+        status_en,
+        status_ar,
+        owner_en,
+        owner_ar,
+        role_en,
+        role_ar,
+        units,
+        area,
+        description_en,
+        description_ar,
+        sort_order,
+        is_featured,
+        is_active
+      `)
+      .eq("is_featured", false)
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+
+    if (error) {
+      console.error("Failed to load projects:", error);
+      setProjectsLoading(false);
+      return;
+    }
+
+    const formattedProjects: Project[] = (data || []).map((project) => ({
+      id: project.id,
+
+      title: {
+        en: project.name_en,
+        ar: project.name_ar,
+      },
+
+      image:
+        project.cover_image_url ||
+        fallbackProjectImages[project.id] ||
+        "/image/projects-page-bg.jpg",
+
+      location: {
+        en: project.location_en || "",
+        ar: project.location_ar || "",
+      },
+
+      status: {
+        en: project.status_en || "",
+        ar: project.status_ar || "",
+      },
+
+      owner:
+        project.owner_en || project.owner_ar
+          ? {
+              en: project.owner_en || "",
+              ar: project.owner_ar || "",
+            }
+          : null,
+
+      role:
+        project.role_en || project.role_ar
+          ? {
+              en: project.role_en || "",
+              ar: project.role_ar || "",
+            }
+          : null,
+
+      units: project.units,
+      area: project.area,
+
+      description:
+        project.description_en || project.description_ar
+          ? {
+              en: project.description_en || "",
+              ar: project.description_ar || "",
+            }
+          : null,
+    }));
+
+    setProjects(formattedProjects);
+    setProjectsLoading(false);
+  };
+
+  loadProjects();
+}, []);
   useEffect(() => {
     if (!selectedProject) return;
 
@@ -86,373 +191,11 @@ export default function ProjectsPage() {
     localStorage.setItem("saaco-language", newLanguage);
   };
 
-  const projects: Project[] = [
-    {
-      id: 1,
-
-      title: {
-        en: "Al Wajha Residential Project",
-        ar: "مشروع الواجهة السكنية",
-      },
-
-      image: "/image/al-wajha-project.jpg",
-
-      location: {
-        en: "Dammam",
-        ar: "الدمام",
-      },
-
-      status: {
-        en: "Completed",
-        ar: "مكتمل",
-      },
-
-      owner: {
-        en: "National Housing Company",
-        ar: "الشركة الوطنية للإسكان",
-      },
-
-      role: {
-        en: "Contractor",
-        ar: "مقاول",
-      },
-
-      units: "590",
-
-      area: "159,300 SM",
-
-      description: {
-        en: "Al Wajha Residential Project is a large-scale residential development located in Dammam and developed for the National Housing Company. The project spans a total area of 159,300 square meters and includes 590 residential units designed according to engineering standards that ensure efficient use of space. The project is supported by advanced infrastructure and high-quality construction specifications, reflecting the company's ability to execute major residential developments efficiently and in line with quality-of-life requirements.",
-
-        ar: "يعد مشروع الواجهة السكنية مجمعاً سكنياً ضخماً يقع في مدينة الدمام، ويتم تطويره لصالح الشركة الوطنية للإسكان. يمتد المشروع على مساحة إجمالية واسعة تصل إلى 159,300 متر مربع، ويضم 590 وحدة سكنية صممت وفق معايير هندسية تضمن الاستغلال الفعال للمساحات. يرتكز المشروع على بنية تحتية متطورة ومواصفات إنشائية عالية الجودة تعكس قدرة الشركة على تنفيذ المشاريع السكنية الكبرى بكفاءة تشغيلية تتماشى مع متطلبات جودة الحياة.",
-      },
-    },
-
-    {
-  id: 2,
-
-  title: {
-    en: "Lavera Residential Compound",
-    ar: "مجمع لافيرا السكني",
-  },
-
-  image: "/image/lavera-project.jpg",
-
-  location: {
-    en: "Al Khobar",
-    ar: "الخبر",
-  },
-
-  status: {
-    en: "Completed",
-    ar: "مكتمل",
-  },
-
-  owner: {
-    en: "AlKooheji Contracting",
-    ar: "الكوهجي للمقاولات",
-  },
-
-  role: {
-    en: "Contractor",
-    ar: "مقاول",
-  },
-
-  units: "18",
-
-  area: "7,200 SM",
-
-  description: {
-    en: "Lavera Residential Compound is strategically located in Al Khobar with direct views of the coastal strip. The project includes a variety of residential units, including villas and apartments, designed with high-quality luxury finishing standards. The project was executed using conventional cast-in-place concrete construction to ensure structural strength and durability, while the architectural design takes advantage of the sea view and the project's distinguished location.",
-
-    ar: "يقع مجمع لافيرا السكني في موقع استراتيجي بمدينة الخبر بإطلالة مباشرة على الشريط الساحلي. يضم المشروع وحدات سكنية متنوعة تشمل فللاً وشققاً صممت بمعايير تشطيب فاخرة وعالية الجودة. تم تنفيذ المشروع باستخدام تقنية البناء التقليدية وصب الخرسانة في الموقع لضمان أقصى درجات المتانة والصلابة الإنشائية، مع توظيف التصاميم المعمارية التي تضمن الاستفادة من الإطلالة البحرية والموقع المتميز.",
-  },
-},
-    {
-  id: 3,
-
-  title: {
-    en: "Al Wurud Sales Center",
-    ar: "مركز مبيعات الورود",
-  },
-
-  image: "/image/al-wurud-sales-center.jpg",
-
-  location: {
-    en: "Al Ahsa",
-    ar: "الأحساء",
-  },
-
-  status: {
-    en: "Completed",
-    ar: "مكتمل",
-  },
-
-  owner: {
-    en: "National Housing Company",
-    ar: "الشركة الوطنية للإسكان",
-  },
-
-  role: {
-    en: "Contractor",
-    ar: "مقاول",
-  },
-
-  units: "1",
-
-  area: "8,000 SM",
-
-  description: {
-    en: "Al Wurud Sales Center is a commercial and service project developed in Al Ahsa for the National Housing Company. The project spans an area of 8,000 square meters and was designed as an integrated center for receiving customers within a modern and practical working environment. The project was completed in full within a record period of 10 months, demonstrating the company’s efficiency in project management, strict adherence to schedules, and commitment to quality standards in execution.",
-
-    ar: "يعد مركز مبيعات الورود مشروعاً تجارياً خدمياً تم تطويره في مدينة الأحساء لصالح الشركة الوطنية للإسكان. يمتد المشروع على مساحة 8,000 متر مربع، وصمم ليكون مركزاً متكاملاً لاستقبال العملاء ضمن بيئة عمل حديثة وعملية. تم إنجاز المشروع بالكامل بنسبة 100% خلال فترة قياسية بلغت 10 أشهر، مما يبرز كفاءة الشركة في إدارة المشاريع والالتزام الصارم بالجداول الزمنية مع الحفاظ على معايير الجودة في التنفيذ.",
-  },
-},
-{
-  id: 4,
-
-  title: {
-    en: "Mursia Mosque",
-    ar: "مسجد مرسية",
-  },
-
-  image: "/image/mursia-mosque.jpg",
-
-  location: {
-    en: "Riyadh",
-    ar: "الرياض",
-  },
-
-  status: {
-    en: "Completed",
-    ar: "مكتمل",
-  },
-
-  owner: {
-    en: "National Housing Company",
-    ar: "الشركة الوطنية للإسكان",
-  },
-
-  role: {
-    en: "Contractor",
-    ar: "مقاول",
-  },
-
-  units: "1",
-
-  area: "2,064.97 SM",
-
-  description: {
-    en: "The Mursia Mosque project embodies the concept of contemporary Islamic architecture through a design that combines the spirituality of the place with modern architectural details, creating an integrated spiritual environment that serves worshippers and aligns with the needs of the modern community in Riyadh. The project spans an area of 2,064.97 square meters and was executed to the highest standards of quality and professionalism for the National Housing Company.",
-
-    ar: "يجسد مشروع مسجد مرسية مفهوم العمارة الإسلامية المعاصرة من خلال تصميم يجمع بين روحانية المكان وحداثة التفاصيل المعمارية، ليشكل بيئة إيمانية متكاملة تخدم المصلين وتنسجم مع احتياجات المجتمع الحديث في مدينة الرياض. يمتد المشروع على مساحة 2,064.97 متر مربع، وتم تنفيذه وفق أعلى معايير الجودة والاحترافية لصالح الشركة الوطنية للإسكان.",
-  },
-},
-{
-  id: 5,
-
-  title: {
-    en: "Al Drees Mosque",
-    ar: "مسجد الدريس",
-  },
-
-  image: "/image/al-drees-mosque.jpg",
-
-  location: {
-    en: "Riyadh",
-    ar: "الرياض",
-  },
-
-  status: {
-    en: "Completed",
-    ar: "مكتمل",
-  },
-
-  owner: {
-    en: "National Housing Company",
-    ar: "الشركة الوطنية للإسكان",
-  },
-
-  role: {
-    en: "Contractor",
-    ar: "مقاول",
-  },
-
-  units: "1",
-
-  area: "3,775.45 SM",
-
-  description: {
-    en: "The Al Drees Mosque project reflects an architectural vision that combines authentic Islamic character with contemporary design, within a spiritual environment carefully designed to provide comfort and tranquility for worshippers and serve the community with high quality and thoughtful details. The project spans an area of 3,775.45 square meters and was executed for the National Housing Company in accordance with the highest standards of quality and professionalism, within a design that aligns with modern architectural identity and enhances the presence of the place within Riyadh’s urban landscape.",
-
-    ar: "يعكس مشروع مسجد الدريس رؤية معمارية تجمع بين الطابع الإسلامي الأصيل والتصميم المعاصر، ضمن بيئة إيمانية صممت بعناية لتوفر الراحة والسكينة للمصلين وتخدم المجتمع بجودة عالية وتفاصيل مدروسة. يمتد المشروع على مساحة 3,775.45 متر مربع، وتم تنفيذه لصالح الشركة الوطنية للإسكان وفق أعلى معايير الجودة والاحترافية ضمن تصميم ينسجم مع الهوية المعمارية الحديثة ويعزز حضور المكان ضمن المشهد العمراني في مدينة الرياض.",
-  },
-},
-{
-  id: 6,
-
-  title: {
-    en: "Al Majhad Mosque",
-    ar: "مسجد المجحد",
-  },
-
-  image: "/image/al-majhad-mosque.jpg",
-
-  location: {
-    en: "Riyadh",
-    ar: "الرياض",
-  },
-
-  status: {
-    en: "Completed",
-    ar: "مكتمل",
-  },
-
-  owner: {
-    en: "National Housing Company",
-    ar: "الشركة الوطنية للإسكان",
-  },
-
-  role: {
-    en: "Contractor",
-    ar: "مقاول",
-  },
-
-  units: "1",
-
-  area: "1,786 SM",
-
-  description: {
-    en: "The Al Majhad Mosque project is located in Riyadh and features a modern architectural design that balances aesthetics and functionality while providing a comfortable spiritual environment for worshippers. The project spans an area of 1,786 square meters and was executed to high quality standards with integrated facilities for the National Housing Company.",
-
-    ar: "يقع مشروع مسجد المجحد في مدينة الرياض، بتصميم معماري حديث يوازن بين الجمال والوظيفة، ويوفر بيئة روحانية مريحة للمصلين. يمتد المشروع على مساحة 1,786 متر مربع، وتم تنفيذه بمعايير جودة عالية ضمن مرافق متكاملة لصالح الشركة الوطنية للإسكان.",
-  },
-},
-{
-  id: 7,
-
-  title: {
-    en: "Jira Makkah Project",
-    ar: "مشروع جيرا مكة",
-  },
-
-  image: "/image/jira-makkah-project.jpg",
-
-  location: {
-    en: "Makkah",
-    ar: "مكة",
-  },
-
-  status: {
-    en: "In Progress",
-    ar: "تحت التنفيذ",
-  },
-
-  owner: {
-    en: "Al Tahaluf Real Estate",
-    ar: "التحالف العقارية",
-  },
-
-  role: {
-    en: "Contractor",
-    ar: "مقاول",
-  },
-
-  units: "1",
-
-  area: "190,000 SM",
-
-  description: {
-    en: "Jira Makkah is one of the major development projects being executed by the company in Makkah for Al Tahaluf Real Estate. The project spans a total area of 190,000 square meters and is distinguished by its strategic location and engineering planning that aligns with modern urban development standards. The project focuses on delivering integrated infrastructure and facilities that ensure operational efficiency, while maintaining full commitment to the highest standards of quality and the structural capabilities required for large-scale developments.",
-
-    ar: "يعد مشروع جيرا مكة من المشاريع التطويرية الكبرى التي تنفذها الشركة في مدينة مكة المكرمة لصالح شركة التحالف العقارية. يمتد المشروع على مساحة إجمالية واسعة تصل إلى 190,000 متر مربع، ويتميز بموقع استراتيجي وتخطيط هندسي يواكب معايير التطوير الحضري الحديثة. يرتكز العمل في المشروع على تقديم بنية تحتية ومنشآت متكاملة تضمن كفاءة التشغيل، مع الالتزام التام بأعلى معايير الجودة والقدرة الإنشائية التي تتطلبها المشاريع ذات المساحات الشاسعة.",
-  },
-},
-{
-  id: 8,
-
-  title: {
-  en: "Ishraq Living",
-  ar: "إشراق ليفنج",
-},
-
-  image: "/image/living-project.jpg",
-
-  location: {
-    en: "Riyadh",
-    ar: "الرياض",
-  },
-
-  status: {
-    en: "Completed",
-    ar: "مكتمل",
-  },
-
-  owner: {
-    en: "Al Tahaluf Real Estate",
-    ar: "التحالف العقارية",
-  },
-
-  role: {
-    en: "Contractor",
-    ar: "مقاول",
-  },
-
-  units: "2229",
-
-  area: "612,975 SM",
-
-  description: {
-    en: "Living is one of the integrated residential projects in northern Riyadh, strategically located west of King Khalid International Airport and near Princess Nourah University. The project comprises 2,229 diverse residential units, including villas, townhouses, and duplex apartments, with designs that prioritize efficient use of space and residents’ privacy. The project utilizes precast insulated concrete technologies, along with advanced infrastructure that includes fiber-optic networks and electricity, water, and sewage services, providing an integrated residential environment that meets the requirements of modern living.",
-
-    ar: "يعد مشروع ليفنج أحد المشاريع السكنية المتكاملة في شمال الرياض، ويقع في موقع استراتيجي غرب مطار الملك خالد الدولي وبالقرب من جامعة الأميرة نورة. يضم المشروع 2,229 وحدة سكنية متنوعة تشمل الفلل والتاون هاوس وشقق الدوبلكس، بتصاميم تراعي كفاءة استغلال المساحات وخصوصية السكان. يعتمد المشروع على تقنيات الخرسانة المعزولة مسبقة الصب، إلى جانب بنية تحتية متطورة تضم شبكات الألياف البصرية وخدمات الكهرباء والمياه والصرف الصحي، بما يوفر بيئة سكنية متكاملة تلبي متطلبات الحياة العصرية.",
-  },
-},
-{
-  id: 9,
-
-  title: {
-    en: "Misk Schools",
-    ar: "مدارس مسك",
-  },
-
-  image: "/image/misk-schools.jpg",
-
-  location: {
-    en: "Riyadh",
-    ar: "الرياض",
-  },
-
-  status: {
-    en: "In Progress",
-    ar: "تحت التنفيذ",
-  },
-
-  owner: {
-    en: "National Housing Company",
-    ar: "الشركة الوطنية للإسكان",
-  },
-
-  role: {
-    en: "Contractor",
-    ar: "مقاول",
-  },
-
-  units: "مدارس بنين وبنات",
-
-  area: "30,444.31 SM",
-
-  description: {
-    en: "Misk Schools is a pioneering educational project in Riyadh that reflects our commitment to the highest standards of construction quality. The project spans more than 30,000 square meters and includes integrated educational facilities for boys and girls, designed according to modern architectural standards that meet the aspirations of future generations. We are proud to execute this project for the National Housing Company, applying rigorous international execution standards to provide an advanced and inspiring educational environment.",
-
-    ar: "مشروع تعليمي رائد في مدينة الرياض يجسد التزامنا بأعلى معايير الجودة الإنشائية. يمتد المشروع على مساحة تتجاوز 30 ألف متر مربع، ويضم مرافق تعليمية متكاملة للبنين والبنات، صممت وفق أحدث الطرز المعمارية التي تلبي تطلعات الأجيال القادمة. نفخر بتنفيذ هذا المشروع لصالح الشركة الوطنية للإسكان، مطبقين أدق معايير التنفيذ العالمية لضمان بيئة تعليمية محفزة ومتطورة.",
-  },
-},
-  ];
-
-  if (!languageReady) {
-    return null;
-  }
+  
+
+  if (!languageReady || projectsLoading) {
+  return null;
+}
 
   return (
     <>
