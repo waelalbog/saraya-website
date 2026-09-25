@@ -59,10 +59,41 @@ export default function ProjectsPage() {
   const [language, setLanguage] = useState<Language>("en");
   const [languageReady, setLanguageReady] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [projectImages, setProjectImages] = useState<string[]>([]);
+const [projectImagesLoading, setProjectImagesLoading] = useState(false);
 const [projects, setProjects] = useState<Project[]>([]);
 const [projectsLoading, setProjectsLoading] = useState(true);
   const isArabic = language === "ar";
+useEffect(() => {
+  const loadProjectImages = async () => {
+    if (!selectedProject) {
+      setProjectImages([]);
+      return;
+    }
 
+    setProjectImagesLoading(true);
+
+    const { data, error } = await supabase
+      .from("project_images")
+      .select("image_url")
+      .eq("project_id", selectedProject.id)
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+
+    if (error) {
+      console.error("Failed to load project images:", error);
+      setProjectImages([]);
+    } else {
+      setProjectImages(
+        (data || []).map((item) => item.image_url)
+      );
+    }
+
+    setProjectImagesLoading(false);
+  };
+
+  loadProjectImages();
+}, [selectedProject]);
   useEffect(() => {
     const savedLanguage = localStorage.getItem("saaco-language");
 
@@ -334,7 +365,7 @@ useEffect(() => {
           onClick={() => setSelectedProject(null)}
         >
           <div
-            className="relative max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8 lg:p-10"
+            className="relative max-h-[92vh] w-full max-w-7xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8 lg:p-10"
             onClick={(event) => event.stopPropagation()}
           >
             {/* Close */}
@@ -413,10 +444,49 @@ useEffect(() => {
                 label={isArabic ? "نسبة الإنجاز" : "Completion"}
                 value={selectedProject.status[language]}
               />
+              </div>
+{/* Project Images */}
+<div className="mt-10 border-t border-zinc-200 pt-8">
+  <div className="mb-6">
+    <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#2B347A]">
+      {isArabic ? "صور المشروع" : "Project Images"}
+    </p>
 
+    <h3 className="mt-2 text-2xl font-black text-zinc-950">
+      {isArabic ? "معرض المشروع" : "Project Gallery"}
+    </h3>
+  </div>
+
+  {projectImagesLoading ? (
+    <p className="text-sm text-zinc-500">
+      {isArabic ? "جاري تحميل الصور..." : "Loading images..."}
+    </p>
+  ) : projectImages.length === 0 ? (
+    <p className="text-sm text-zinc-500">
+      {isArabic
+        ? "لا توجد صور إضافية لهذا المشروع حالياً."
+        : "No additional images available for this project."}
+    </p>
+  ) : (
+    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+  {projectImages.map((imageUrl, index) => (
+    <div
+      key={`${imageUrl}-${index}`}
+      className="overflow-hidden rounded-2xl bg-zinc-100"
+    >
+      <img
+        src={imageUrl}
+        alt={`${selectedProject.title[language]} ${index + 1}`}
+        className="h-[320px] w-full object-cover sm:h-[320px] lg:h-[300px]"
+      />
+    </div>
+  ))}
+</div>
+  )}
+           </div>
             </div>
           </div>
-        </div>
+        
       )}
     </>
   );

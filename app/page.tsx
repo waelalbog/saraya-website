@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function Home() {
   const [language, setLanguage] = useState<"en" | "ar">("en");
@@ -10,6 +11,46 @@ const [languageReady, setLanguageReady] = useState(false);
 const [selectedHomeProject, setSelectedHomeProject] = useState<
     "sama" | "sekak" | "rawa" | null
   >(null);
+  const [homeProjectImages, setHomeProjectImages] = useState<string[]>([]);
+const [homeProjectImagesLoading, setHomeProjectImagesLoading] = useState(false);
+useEffect(() => {
+  const loadHomeProjectImages = async () => {
+    if (!selectedHomeProject) {
+      setHomeProjectImages([]);
+      return;
+    }
+
+    const projectIdMap = {
+      sama: 1,
+      sekak: 2,
+      rawa: 3,
+    };
+
+    const projectId = projectIdMap[selectedHomeProject];
+
+    setHomeProjectImagesLoading(true);
+
+    const { data, error } = await supabase
+      .from("project_images")
+      .select("image_url")
+      .eq("project_id", projectId)
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+
+    if (error) {
+      console.error("Failed to load home project images:", error);
+      setHomeProjectImages([]);
+    } else {
+      setHomeProjectImages(
+        (data || []).map((item) => item.image_url)
+      );
+    }
+
+    setHomeProjectImagesLoading(false);
+  };
+
+  loadHomeProjectImages();
+}, [selectedHomeProject]);
   const isArabic = language === "ar";
 useEffect(() => {
   const savedLanguage = localStorage.getItem("saaco-language") as "en" | "ar" | null;
@@ -1249,51 +1290,8 @@ return (
               value={isArabic ? "تحت التنفيذ" : "Under Construction"}
             />
           </div>
-          {/* Project Gallery */}
-<div className="mt-12 border-t border-zinc-200 pt-8">
-  <div className="mb-6">
-    <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#2B347A]">
-      {isArabic ? "صور المشروع" : "Project Gallery"}
-    </p>
+         
 
-    <h3 className="mt-2 text-2xl font-black text-zinc-950">
-      {isArabic
-        ? "لقطات من مشروع سكك تلاله"
-        : "Inside Sekak Talalah"}
-    </h3>
-  </div>
-
-  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    {[
-      "/image/sekak-01.jpg",
-      "/image/sekak-02.jpg",
-      "/image/sekak-03.jpg",
-      "/image/sekak-04.jpg",
-      "/image/sekak-05.jpg",
-      "/image/sekak-06.jpg",
-      "/image/sekak-07.jpg",
-      "/image/sekak-08.jpg",
-      "/image/sekak-09.jpg",
-    ].map((image, index) => (
-      <div
-        key={image}
-        className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-zinc-100"
-      >
-        <Image
-          src={image}
-          alt={
-            isArabic
-              ? `صورة ${index + 1} من مشروع سكك تلاله`
-              : `Sekak Talalah project image ${index + 1}`
-          }
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-        />
-      </div>
-    ))}
-  </div>
-</div>
         </>
       )}
 
@@ -1364,6 +1362,45 @@ return (
           </div>
         </>
       )}
+      {/* ================= HOME PROJECT GALLERY ================= */}
+<div className="mt-12 border-t border-zinc-200 pt-8">
+  <div className="mb-6">
+    <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#2B347A]">
+      {isArabic ? "صور المشروع" : "Project Images"}
+    </p>
+
+    <h3 className="mt-2 text-2xl font-black text-zinc-950">
+      {isArabic ? "معرض المشروع" : "Project Gallery"}
+    </h3>
+  </div>
+
+  {homeProjectImagesLoading ? (
+    <p className="text-sm text-zinc-500">
+      {isArabic ? "جاري تحميل الصور..." : "Loading images..."}
+    </p>
+  ) : homeProjectImages.length === 0 ? (
+    <p className="text-sm text-zinc-500">
+      {isArabic
+        ? "لا توجد صور إضافية لهذا المشروع حالياً."
+        : "No additional images available for this project."}
+    </p>
+  ) : (
+    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {homeProjectImages.map((imageUrl, index) => (
+        <div
+          key={`${imageUrl}-${index}`}
+          className="overflow-hidden rounded-2xl bg-zinc-100"
+        >
+          <img
+            src={imageUrl}
+            alt={`Project image ${index + 1}`}
+            className="h-[300px] w-full object-cover"
+          />
+        </div>
+      ))}
+    </div>
+  )}
+</div>
     </div>
   </div>
 )}
