@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, IBM_Plex_Sans_Arabic, Montserrat } from "next/font/google";
 import "./globals.css";
-
+import { Analytics } from "@vercel/analytics/react";
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
@@ -51,7 +51,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${montserrat.variable} ${geistMono.variable} ${ibmPlexArabic.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">{children}
+        <Analytics />
+      </body>
     </html>
   );
 }
